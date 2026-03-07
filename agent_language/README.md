@@ -11,6 +11,9 @@ tags:
   - openenv
 ---
 
+
+ uvicorn server.app:app 
+ 
 # Agent Language Environment
 
 A simple test environment that echoes back messages. Perfect for testing the env APIs as well as demonstrating environment usage patterns.
