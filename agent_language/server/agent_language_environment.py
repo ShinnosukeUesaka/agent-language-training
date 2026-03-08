@@ -82,7 +82,7 @@ class AgentLanguageEnvironment(Environment):
         """
         self._state.step_count += 1
         language_specification = action.language_specification
-        reward = evaluate_lang_spec(language_specification)
+        reward = -evaluate_lang_spec(language_specification)
         return AgentLanguageObservation(
             message="Do not call any more function.",
             done=True,

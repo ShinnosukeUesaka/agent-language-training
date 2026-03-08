@@ -1,51 +1,39 @@
 {
-  "correct": true,
-  "errors": [],
-  "num_overlaps": 2,
+  "correct": false,
+  "errors": [
+    "Agent said NO_VALID_TIME but valid meetings exist"
+  ],
+  "num_overlaps": 1,
   "valid_meetings": [
     {
-      "day": "We",
+      "day": "Th",
       "location": "NYC",
-      "start": 10.0,
-      "end": 16.0
-    },
-    {
-      "day": "Fr",
-      "location": "SF",
-      "start": 9.0,
-      "end": 14.0
+      "start": 11.0,
+      "end": 15.0
     }
   ],
   "schedules": {
-    "T": "Monday in NYC, 15-17; Wednesday in NYC, 8-18; Friday in SF, 9-15",
-    "J": "Tuesday in SF, 12-15; Wednesday in NYC, 10-16; Thursday in NYC, 15-18; Friday in SF, 8-14"
+    "T": "Monday in SF, 10-16; Thursday in NYC, 11-15",
+    "J": "Monday in NYC, 16-18; Tuesday in SF, 10-16; Wednesday in SF, 12-17; Thursday in NYC, 10-18; Friday in SF, 16-18"
   },
-  "combined_completion_tokens": 281,
-  "combined_chars": 741,
-  "total_turns": 2,
+  "combined_completion_tokens": 34,
+  "combined_chars": 132,
+  "total_turns": 1,
   "agents": {
     "T": {
       "turns": 1,
-      "completion_tokens": 110
+      "completion_tokens": 34
     },
     "J": {
-      "turns": 1,
-      "completion_tokens": 171
+      "turns": 0,
+      "completion_tokens": 0
     }
   },
-  "meeting": {
-    "day": "We",
-    "location": "NYC",
-    "time": 10.0
-  },
+  "meeting": null,
   "conversation": [
     {
       "agent": "T",
-      "content": "To propose a meeting time, I need to know your availability and location. Here is my schedule for 30-minute blocks:\n\n- **Monday in NYC:** 15:00 - 17:00\n- **Wednesday in NYC:** 08:00 - 18:00\n- **Friday in SF:** 09:00 - 15:00\n\nPlease note that we must be in the same city on the same day to meet. Please provide your availability."
-    },
-    {
-      "agent": "J",
-      "content": "Checking our schedules:\n\n- Monday: I am not available.\n- Wednesday: We are both in NYC. My availability is 10:00 - 16:00. Your availability is 08:00 - 18:00. We can meet between 10:00 and 16:00.\n- Friday: We are both in SF. My availability is 08:00 - 14:00. Your availability is 09:00 - 15:00. We can meet between 09:00 and 14:00.\n\nI suggest we meet on Wednesday in NYC at 10:00.\n\n=> We[NYC]10-10:30 TASK_COMPLETE"
+      "content": "Please provide the details (M?, T:, J:) for the meeting request so I can evaluate the slots. Otherwise:\n\nNO_VALID_TIME\nTASK_COMPLETE"
     }
   ]
 }

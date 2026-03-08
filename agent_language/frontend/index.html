@@ -333,9 +333,9 @@
         updateObsDisplay(obs);
         if (data.state) {
           updateStateDisplay({ ...data.state, status: 'Running' });
-          addToHistory(data.state.step_count, message, obs.reward ?? 0);
+          addToHistory(data.state.step_count, message, data.reward ?? 0);
         } else {
-          addToHistory(actionHistory.length + 1, message, obs.reward ?? 0);
+          addToHistory(actionHistory.length + 1, message, data.reward ?? 0);
         }
         document.getElementById('messageInput').value = '';
       } catch (e) {
