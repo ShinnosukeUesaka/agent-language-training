@@ -1077,6 +1077,7 @@ source = { editable = "." }
 dependencies = [
     { name = "openai" },
     { name = "openenv-core", extra = ["core"] },
+    { name = "python-dotenv" },
 ]
 
 [package.optional-dependencies]
@@ -1091,6 +1092,7 @@ requires-dist = [
     { name = "openenv-core", extras = ["core"], specifier = ">=0.2.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
 ]
 provides-extras = ["dev"]
 

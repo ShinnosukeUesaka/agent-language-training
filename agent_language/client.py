@@ -55,7 +55,7 @@ class AgentLanguageEnv(
             Dictionary representation suitable for JSON encoding
         """
         return {
-            "message": action.message,
+            "language_specification": action.language_specification,
         }
 
     def _parse_result(self, payload: Dict) -> StepResult[AgentLanguageObservation]:
@@ -70,11 +70,9 @@ class AgentLanguageEnv(
         """
         obs_data = payload.get("observation", {})
         observation = AgentLanguageObservation(
-            echoed_message=obs_data.get("echoed_message", ""),
-            message_length=obs_data.get("message_length", 0),
+            message=obs_data.get("message", ""),
             done=payload.get("done", False),
             reward=payload.get("reward"),
-            metadata=obs_data.get("metadata", {}),
         )
 
         return StepResult(

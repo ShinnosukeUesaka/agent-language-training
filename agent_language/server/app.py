@@ -35,12 +35,17 @@ except Exception as e:  # pragma: no cover
         "openenv is required for the web interface. Install dependencies with '\n    uv sync\n'"
     ) from e
 
+import os
+
+import dotenv
 from fastapi.middleware.cors import CORSMiddleware
+
+dotenv.load_dotenv()
 
 # Import from local models.py (PYTHONPATH includes /app/env in Docker)
 from models import AgentLanguageAction, AgentLanguageObservation
-from .agent_language_environment import AgentLanguageEnvironment
 
+from .agent_language_environment import AgentLanguageEnvironment
 
 # Create the app with web interface and README integration
 app = create_app(

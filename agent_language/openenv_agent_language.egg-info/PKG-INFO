@@ -5,6 +5,7 @@ Summary: Agent Language environment for OpenEnv
 Requires-Python: >=3.10
 Requires-Dist: openai>=2.26.0
 Requires-Dist: openenv-core[core]>=0.2.0
+Requires-Dist: python-dotenv>=1.2.2
 Provides-Extra: dev
 Requires-Dist: pytest>=8.0.0; extra == "dev"
 Requires-Dist: pytest-cov>=4.0.0; extra == "dev"

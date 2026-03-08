@@ -5,6 +5,7 @@ models.py
 pyproject.toml
 ./__init__.py
 ./client.py
+./evaluate_protocal.py
 ./models.py
 openenv_agent_language.egg-info/PKG-INFO
 openenv_agent_language.egg-info/SOURCES.txt
@@ -15,4 +16,3 @@ openenv_agent_language.egg-info/top_level.txt
 server/__init__.py
 server/agent_language_environment.py
 server/app.py
-server/evaluate_protocal.py

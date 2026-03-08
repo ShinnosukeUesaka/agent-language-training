@@ -13,10 +13,11 @@ Perfect for testing HTTP server infrastructure.
 
 from uuid import uuid4
 
+from evaluate_protocal import evaluate_lang_spec
 from models import AgentLanguageAction, AgentLanguageObservation, AgentLanguageState
 from openenv.core.env_server.interfaces import Environment
 
-COMMUNICATION_PROTOCAL_PROMPT = """"You are refining a communication protocol between two agents. Produce language specification that **minimize** the number of tokens needed for a single exchange while preserving clarity. This could be some abbreviation synonyms or some template for the communication. Your communication protocal might be detailed and should include examples of the communication. Try not to limit the amount of actual information that is passed to each agent. Instead forcus on formtting of the communication, and telling the agents to abbreviate and make the communication as short as possible. The communication protocal itsefl does not need to be concise, it should be in natural language with full sentences, even paragraphs if needed, and easy to understand.
+COMMUNICATION_PROTOCAL_PROMPT = """"You are generating a communication protocol between two agents. Produce language specification that **minimize** the number of tokens needed for a single exchange while preserving clarity. This could be some abbreviation synonyms or some template for the communication. Your communication protocal might be detailed and should include examples of the communication. Try not to limit the amount of actual information that is passed to each agent. Instead forcus on formtting of the communication, and telling the agents to abbreviate and make the communication as short as possible. The communication protocal itsefl does not need to be concise, it should be in natural language with full sentences, even paragraphs if needed, and easy to understand.
 
 Example:
 When you communicate, avoid extra greetings.
@@ -45,13 +46,12 @@ class AgentLanguageEnvironment(Environment):
     # getting their own environment instance (when using factory mode in app.py).
     SUPPORTS_CONCURRENT_SESSIONS: bool = True
 
-    def __init__(self, seed):
+    def __init__(self):
         """Initialize the agent_language environment."""
         self._state = AgentLanguageState(episode_id=str(uuid4()), step_count=0)
         self._reset_count = 0
-        self.seed = seed
 
-    def reset(self, seed) -> AgentLanguageObservation:
+    def reset(self) -> AgentLanguageObservation:
         """
         Reset the environment.
 
@@ -61,7 +61,7 @@ class AgentLanguageEnvironment(Environment):
         self._state = AgentLanguageState(episode_id=str(uuid4()), step_count=0)
         self._reset_count += 1
 
-        message = COMMUNICATION_PROTOCAL_PROMPT + "\n\n Design a communication protocal for scheduling a meeting time."
+        message = COMMUNICATION_PROTOCAL_PROMPT + "\n\n Design a communication protocal for two agents scheduling a meeting time."
 
         return AgentLanguageObservation(
             message=message,
@@ -81,11 +81,10 @@ class AgentLanguageEnvironment(Environment):
             AgentLanguageObservation with the echoed message and its length
         """
         self._state.step_count += 1
-        message = action.message
-        
-        reward = 0
+        language_specification = action.language_specification
+        reward = evaluate_lang_spec(language_specification)
         return AgentLanguageObservation(
-            echoed_message=message,
+            message="Do not call any more function.",
             done=True,
             reward=reward,
             #metadata={"original_message": message, "step": self._state.step_count},
