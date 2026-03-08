@@ -18,11 +18,10 @@ from openenv.core.env_server.types import Action, Observation
 class AgentLanguageAction(Action):
     """Action for the Agent Language environment - just a message to echo."""
 
-    message: str = Field(..., description="Message to echo back")
+    language_specification: str = Field(..., description="Language Specification")
 
 
 class AgentLanguageObservation(Observation):
     """Observation from the Agent Language environment - the echoed message."""
 
-    echoed_message: str = Field(default="", description="The echoed message")
-    message_length: int = Field(default=0, description="Length of the echoed message")
+    message: str = Field(default="", description="Scenario")

@@ -35,6 +35,8 @@ except Exception as e:  # pragma: no cover
         "openenv is required for the web interface. Install dependencies with '\n    uv sync\n'"
     ) from e
 
+from fastapi.middleware.cors import CORSMiddleware
+
 # Import from local models.py (PYTHONPATH includes /app/env in Docker)
 from models import AgentLanguageAction, AgentLanguageObservation
 from .agent_language_environment import AgentLanguageEnvironment
@@ -47,6 +49,13 @@ app = create_app(
     AgentLanguageObservation,
     env_name="agent_language",
     max_concurrent_envs=1,  # increase this number to allow more concurrent WebSocket sessions
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

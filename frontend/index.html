@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Language Environment</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f5f5f7;
+      color: #1a1a1a;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .left-col, .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      margin-bottom: 6px;
+    }
+
+    label .required {
+      color: #e53e3e;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      padding: 10px 12px;
+      border: 2px solid #4a90d9;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-family: inherit;
+      resize: vertical;
+      outline: none;
+      color: #555;
+    }
+
+    textarea:focus {
+      border-color: #2563eb;
+    }
+
+    .field-hint {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:active { opacity: 0.7; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary { background: #4a7fd4; color: #fff; }
+    .btn-secondary { background: #5a6472; color: #fff; }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .state-card .state-row {
+      font-size: 0.875rem;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .state-card .state-row strong {
+      color: #1a1a1a;
+    }
+
+    .obs-pre {
+      background: #f7f8fa;
+      border-radius: 4px;
+      padding: 12px;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.8rem;
+      white-space: pre;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .history-empty {
+      font-size: 0.875rem;
+      color: #555;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      background: #f7f8fa;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+    }
+
+    .history-item .hi-step {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #333;
+    }
+
+    .history-item .hi-action {
+      color: #555;
+      margin-bottom: 2px;
+    }
+
+    .history-item .hi-reward {
+      color: #2563eb;
+      font-size: 0.75rem;
+    }
+
+    .error-msg {
+      color: #c53030;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <!-- LEFT COLUMN -->
+    <div class="left-col">
+      <!-- Take Action Card -->
+      <div class="card">
+        <h2>Take Action</h2>
+        <label>Language Specification <span class="required">*</span>:</label>
+        <textarea id="messageInput" placeholder="Enter language specification..."></textarea>
+        <div class="field-hint">Language Specification</div>
+        <div id="stepError" class="error-msg" style="display:none;"></div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-primary" id="stepBtn" onclick="doStep()">Step</button>
+        </div>
+      </div>
+
+      <!-- Env Controls -->
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="resetBtn" onclick="doReset()">Reset Environment</button>
+        <button class="btn btn-secondary" id="stateBtn" onclick="doGetState()">Get State</button>
+      </div>
+
+      <!-- Current State Card -->
+      <div class="card state-card">
+        <h2>Current State</h2>
+        <div class="state-row">Status: <strong id="stateStatus">—</strong></div>
+        <div class="state-row">Episode ID: <strong id="stateEpisodeId">—</strong></div>
+        <div class="state-row">Step Count: <strong id="stateStepCount">—</strong></div>
+        <div id="stateError" class="error-msg" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right-col">
+      <!-- Current Observation Card -->
+      <div class="card">
+        <h2>Current Observation</h2>
+        <div class="obs-pre" id="obsDisplay">—</div>
+      </div>
+
+      <!-- Action History Card -->
+      <div class="card">
+        <h2>Action History</h2>
+        <div id="historyContainer">
+          <div class="history-empty" id="historyEmpty">No actions taken yet</div>
+          <div class="history-list" id="historyList" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = 'http://localhost:8000';
+
+    const actionHistory = [];
+
+    function setButtons(disabled) {
+      ['stepBtn', 'resetBtn', 'stateBtn'].forEach(id => {
+        document.getElementById(id).disabled = disabled;
+      });
+    }
+
+    function showError(elemId, msg) {
+      const el = document.getElementById(elemId);
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function clearError(elemId) {
+      const el = document.getElementById(elemId);
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+
+    function updateStateDisplay(data) {
+      document.getElementById('stateStatus').textContent = data.status ?? '—';
+      document.getElementById('stateEpisodeId').textContent = data.episode_id ?? '—';
+      document.getElementById('stateStepCount').textContent = data.step_count ?? '—';
+    }
+
+    function updateObsDisplay(obs) {
+      // Show obs as pretty JSON, excluding internal fields if desired
+      const display = {};
+      for (const [k, v] of Object.entries(obs)) {
+        if (!['done', 'reward', 'metadata'].includes(k)) {
+          display[k] = v;
+        }
+      }
+      document.getElementById('obsDisplay').textContent = JSON.stringify(display, null, 2);
+    }
+
+    function addToHistory(stepNum, message, reward) {
+      actionHistory.push({ stepNum, message, reward });
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const empty = document.getElementById('historyEmpty');
+      const list = document.getElementById('historyList');
+      if (actionHistory.length === 0) {
+        empty.style.display = '';
+        list.style.display = 'none';
+        return;
+      }
+      empty.style.display = 'none';
+      list.style.display = 'flex';
+      list.innerHTML = actionHistory.slice().reverse().map(item => `
+        <div class="history-item">
+          <div class="hi-step">Step ${item.stepNum}</div>
+          <div class="hi-action">Spec: "${item.message}"</div>
+          <div class="hi-reward">Reward: ${item.reward.toFixed(2)}</div>
+        </div>
+      `).join('');
+    }
+
+    async function doReset() {
+      clearError('stateError');
+      setButtons(true);
+      try {
+        const res = await fetch(`${BASE_URL}/reset`, { method: 'POST' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        // data contains observation + state
+        if (data.observation) updateObsDisplay(data.observation);
+        if (data.state) updateStateDisplay({ ...data.state, status: 'Reset' });
+        // Clear history on reset
+        actionHistory.length = 0;
+        renderHistory();
+      } catch (e) {
+        showError('stateError', `Reset failed: ${e.message}`);
+      } finally {
+        setButtons(false);
+      }
+    }
+
+    async function doGetState() {
+      clearError('stateError');
+      setButtons(true);
+      try {
+        const res = await fetch(`${BASE_URL}/state`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        updateStateDisplay(data);
+      } catch (e) {
+        showError('stateError', `Get state failed: ${e.message}`);
+      } finally {
+        setButtons(false);
+      }
+    }
+
+    async function doStep() {
+      clearError('stepError');
+      const message = document.getElementById('messageInput').value.trim();
+      if (!message) {
+        showError('stepError', 'Language Specification is required.');
+        return;
+      }
+      setButtons(true);
+      try {
+        const res = await fetch(`${BASE_URL}/step`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ language_specification: message }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const obs = data.observation ?? data;
+        updateObsDisplay(obs);
+        if (data.state) {
+          updateStateDisplay({ ...data.state, status: 'Running' });
+          addToHistory(data.state.step_count, message, obs.reward ?? 0);
+        } else {
+          addToHistory(actionHistory.length + 1, message, obs.reward ?? 0);
+        }
+        document.getElementById('messageInput').value = '';
+      } catch (e) {
+        showError('stepError', `Step failed: ${e.message}`);
+      } finally {
+        setButtons(false);
+      }
+    }
+
+    // Load initial state on page load
+    (async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/state`);
+        if (res.ok) {
+          const data = await res.json();
+          updateStateDisplay(data);
+        }
+      } catch (_) {}
+    })();
+  </script>
+</body>
+</html>

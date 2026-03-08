@@ -19,6 +19,12 @@ from openenv.core.env_server.types import State
 from models import AgentLanguageAction, AgentLanguageObservation
 
 
+COMMUNICATION_PROTOCAL_PROMPT = """"You are refining a communication protocol between two agents. Produce language specification that **minimize** the number of tokens needed for a single exchange while preserving clarity. This could be some abbreviation synonyms or some template for the communication. Your communication protocal might be detailed and should include examples of the communication. Try not to limit the amount of actual information that is passed to each agent. Instead forcus on formtting of the communication, and telling the agents to abbreviate and make the communication as short as possible. The communication protocal itsefl does not need to be concise, it should be in natural language with full sentences, even paragraphs if needed, and easy to understand.
+
+Example:
+
+"""
+
 class AgentLanguageEnvironment(Environment):
     """
     A simple echo environment that echoes back messages.
@@ -58,7 +64,7 @@ class AgentLanguageEnvironment(Environment):
         self._reset_count += 1
 
         return AgentLanguageObservation(
-            echoed_message="Agent Language environment ready!",
+            message=COMMUNICATION_PROTOCAL_PROMPT,
             message_length=0,
             done=False,
             reward=0.0,
@@ -75,19 +81,16 @@ class AgentLanguageEnvironment(Environment):
             AgentLanguageObservation with the echoed message and its length
         """
         self._state.step_count += 1
-
         message = action.message
-        length = len(message)
 
-        # Simple reward: longer messages get higher rewards
-        reward = length * 0.1
-
+                
+        
+        reward = 0
         return AgentLanguageObservation(
             echoed_message=message,
-            message_length=length,
-            done=False,
+            done=True,
             reward=reward,
-            metadata={"original_message": message, "step": self._state.step_count},
+            #metadata={"original_message": message, "step": self._state.step_count},
         )
 
     @property

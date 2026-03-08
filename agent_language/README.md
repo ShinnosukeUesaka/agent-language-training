@@ -12,7 +12,7 @@ tags:
 ---
 
 
- uvicorn server.app:app 
+uvicorn server.app:app 
  
 # Agent Language Environment
 
