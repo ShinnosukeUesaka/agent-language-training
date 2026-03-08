@@ -1075,6 +1075,7 @@ name = "openenv-agent-language"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "openai" },
     { name = "openenv-core", extra = ["core"] },
 ]
 
@@ -1086,6 +1087,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "openai", specifier = ">=2.26.0" },
     { name = "openenv-core", extras = ["core"], specifier = ">=0.2.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },

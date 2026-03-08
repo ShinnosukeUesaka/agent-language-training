@@ -10,9 +10,8 @@ Data models for the Agent Language Environment.
 The agent_language environment is a simple test environment that echoes back messages.
 """
 
+from openenv.core.env_server.types import Action, Observation, State
 from pydantic import Field
-
-from openenv.core.env_server.types import Action, Observation
 
 
 class AgentLanguageAction(Action):
@@ -25,3 +24,6 @@ class AgentLanguageObservation(Observation):
     """Observation from the Agent Language environment - the echoed message."""
 
     message: str = Field(default="", description="Scenario")
+
+class AgentLanguageState(State):
+    """Custom state fields."""
